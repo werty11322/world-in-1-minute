@@ -1,6 +1,5 @@
 import feedparser
 import requests
-import json
 from datetime import datetime
 import os
 
@@ -15,7 +14,7 @@ def fetch_news(feeds):
     articles = []
     for feed_url in feeds:
         feed = feedparser.parse(feed_url)
-        for entry in feed.entries[:5]:  # Берем топ-5 новостей из каждого фида
+        for entry in feed.entries[:5]:
             full_text = f"{entry.title}. {entry.get('summary', '')}"
             articles.append({
                 'title': entry.title,
@@ -27,8 +26,9 @@ def fetch_news(feeds):
 
 def summarize_text(text):
     """Суммаризируем текст с помощью Hugging Face API."""
+    HF_API_TOKEN = os.environ['HFAPITOKEN']
     api_url = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-    headers = {"Authorization": f"Bearer {os.environ['HF_API_TOKEN']}"}
+    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
     payload = {"inputs": text}
     
     try:
@@ -37,18 +37,18 @@ def summarize_text(text):
         if isinstance(result, list) and len(result) > 0:
             return result[0]['summary_text']
         else:
-            return "Не удалось получить суммаризацию для этой новости."
+            return "Не удалось получить суммаризацию."
     except Exception as e:
         return f"Ошибка при суммаризации: {e}"
 
 def send_to_telegram(message):
     """Отправляет дайджест в Telegram-канал."""
-    bot_token = os.environ['TELEGRAM_BOT_TOKEN']
-    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    TELEGRAM_BOT_TOKEN = os.environ['TELEGRAMBOTTOKEN']
+    TELEGRAM_CHAT_ID = os.environ['TELEGRAMCHATID']
     
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
-        "chat_id": chat_id,
+        "chat_id": TELEGRAM_CHAT_ID,
         "text": message,
         "parse_mode": "Markdown",
         "disable_web_page_preview": True
@@ -62,10 +62,9 @@ def main():
     articles = fetch_news(RSS_FEEDS)
     print(f"Получено {len(articles)} новостей. Начинаем суммаризацию...")
     
-    # Создаем дайджест
     digest = f"# 🌍 Мир за минуту | {datetime.now().strftime('%d.%m.%Y')}\n\n"
     
-    for i, article in enumerate(articles[:8], 1):  # Берем топ-8 новостей
+    for i, article in enumerate(articles[:8], 1):
         digest += f"**{i}. {article['title']}**\n"
         digest += f"*Источник: {article['source']}*\n"
         
@@ -73,12 +72,10 @@ def main():
         digest += f"📌 {summary}\n"
         digest += f"🔗 [Читать полностью]({article['link']})\n\n"
     
-    # Отправляем в Telegram
     print("Отправляем в Telegram...")
     result = send_to_telegram(digest)
     print("Результат отправки:", result)
     
-    # Сохраняем в файл для логов
     with open("last_digest.md", "w", encoding="utf-8") as f:
         f.write(digest)
 
