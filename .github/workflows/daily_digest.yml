@@ -24,7 +24,7 @@ jobs:
 
     - name: Run news digest
       env:
-        HF_API_TOKEN: ${{ secrets.HF_API_TOKEN }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+         HFTOKEN: ${{ secrets.HFTOKEN }}
+  TGBOTTOKEN: ${{ secrets.TGBOTTOKEN }}
+  TGCHATID: ${{ secrets.TGCHATID }}
       run: python news_digest.py
