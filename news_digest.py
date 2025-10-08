@@ -26,7 +26,7 @@ def fetch_news(feeds):
 
 def summarize_text(text):
     """Суммаризируем текст с помощью Hugging Face API."""
-    HF_API_TOKEN = os.environ['HFAPITOKEN']
+   HF_API_TOKEN = os.environ['HFTOKEN']
     api_url = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
     headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
     payload = {"inputs": text}
@@ -43,8 +43,8 @@ def summarize_text(text):
 
 def send_to_telegram(message):
     """Отправляет дайджест в Telegram-канал."""
-    TELEGRAM_BOT_TOKEN = os.environ['TELEGRAMBOTTOKEN']
-    TELEGRAM_CHAT_ID = os.environ['TELEGRAMCHATID']
+   TELEGRAM_BOT_TOKEN = os.environ['TGBOTTOKEN']
+  TELEGRAM_CHAT_ID = os.environ['TGCHATID']
     
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {
