@@ -2,13 +2,12 @@ name: Ежедневный дайджест новостей
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # Каждый день в 05:00 UTC (08:00 МСК)
-  workflow_dispatch:  # Позволяет запускать вручную
+    - cron: '0 5 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -19,12 +18,13 @@ jobs:
         python-version: '3.10'
 
     - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
 
     - name: Run news digest
       env:
-         HFTOKEN: ${{ secrets.HFTOKEN }}
-  TGBOTTOKEN: ${{ secrets.TGBOTTOKEN }}
+        HFTOKEN: ${{ secrets.HFTOKEN }}
+        TGBOT: ${{ secrets.TGBOT }}
+        TGCHAT: ${{ secrets.TGCHAT }}
+      run: python news_digest.py
   TGCHATID: ${{ secrets.TGCHATID }}
       run: python news_digest.py
